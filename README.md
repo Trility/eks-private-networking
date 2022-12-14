@@ -12,6 +12,7 @@
  - Certificates uploaded to ACM
    - Use certificates.sh within the repo with paths to polulate openvpn config file
    - Certs made my Terraform were improperly encrypted for Clientvpn
+   - https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/client-authentication.html#mutual
 
 ## Terraform plan/apply creates the following:
  - VPC, Subnets, IGW and NAT Gateway
