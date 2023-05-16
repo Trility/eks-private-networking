@@ -130,7 +130,14 @@ resource "random_string" "clientvpn_prefix" {
   min_lower = 7
 }
 
-resource "local_file" "openvpn_config" {
+resource "aws_s3_bucket" "clientvpn_configs" {
+  bucket        = "trility-clientvpn-configs"
+  force_destroy = true
+}
+
+resource "aws_s3_object" "openvpn_config" {
+  bucket = aws_s3_bucket.clientvpn_configs.id
+  key    = "${var.kms_user}-client-config.ovpn"
   content = templatefile("${path.module}/client-config.ovpn.tpl", {
     random_prefix       = random_string.clientvpn_prefix.result
     client_vpn_endpoint = "${replace(aws_ec2_client_vpn_endpoint.vpn.dns_name, "*", "")}"
@@ -138,5 +145,15 @@ resource "local_file" "openvpn_config" {
     private_key         = file("${path.module}/easy-rsa/easyrsa3/pki/private/client1.domain.tld.key")
     client_cert         = file("${path.module}/easy-rsa/easyrsa3/pki/issued/client1.domain.tld.crt")
   })
-  filename = pathexpand("~/client-config.ovpn")
 }
+
+#resource "local_file" "openvpn_config" {
+#  content = templatefile("${path.module}/client-config.ovpn.tpl", {
+#    random_prefix       = random_string.clientvpn_prefix.result
+#    client_vpn_endpoint = "${replace(aws_ec2_client_vpn_endpoint.vpn.dns_name, "*", "")}"
+#    ca_cert             = file("${path.module}/easy-rsa/easyrsa3/pki/ca.crt")
+#    private_key         = file("${path.module}/easy-rsa/easyrsa3/pki/private/client1.domain.tld.key")
+#    client_cert         = file("${path.module}/easy-rsa/easyrsa3/pki/issued/client1.domain.tld.crt")
+#  })
+#  filename = pathexpand("~/client-config.ovpn")
+#}
